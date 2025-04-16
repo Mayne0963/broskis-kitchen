@@ -1,0 +1,1 @@
+export default function Loyalty() { return <div>Loyalty Dashboard</div>; }

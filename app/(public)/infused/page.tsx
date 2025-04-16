@@ -1,0 +1,1 @@
+export default function InfusedMenu() { return <div>Protected Infused Menu</div>; }
