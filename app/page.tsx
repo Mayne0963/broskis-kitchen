@@ -21,7 +21,7 @@ export default function Home() {
               transition={{ duration: 0.5 }}
               className="hero-title"
             >
-              BOLD FLAVORS, BADASS FOOD
+              Broskis' Kitchen - Luxury Street Gourmet
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
