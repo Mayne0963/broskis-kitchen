@@ -11,6 +11,10 @@ import Image from "next/image"
 import { useAuth } from "@/contexts/AuthContext"
 import { useAgeVerification } from "@/contexts/AgeVerificationContext"
 import AgeVerificationModal from "@/components/AgeVerificationModal"
+import { Filter, ShoppingBag } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import PageTransition from "@/components/PageTransition"
+import StaggeredItems, { StaggeredItem } from "@/components/StaggeredItems"
 
 export default function Shop() {
   const [products, setProducts] = useState<Product[]>([])
@@ -63,65 +67,122 @@ export default function Shop() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Shop Our Menu</h1>
+    <PageTransition>
+      <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-5xl font-bold mb-4">SHOP OUR MENU</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Browse our selection of mouth-watering dishes and place your order for pickup or delivery
+          </p>
+        </motion.div>
 
-      <div className="mb-8">
-        <div className="flex flex-wrap gap-2">
-          <FilterButton active={filter === "all"} onClick={() => setFilter("all")}>
-            All
-          </FilterButton>
-          <FilterButton active={filter === "appetizer"} onClick={() => setFilter("appetizer")}>
-            Appetizers
-          </FilterButton>
-          <FilterButton active={filter === "main"} onClick={() => setFilter("main")}>
-            Main Courses
-          </FilterButton>
-          <FilterButton active={filter === "infused"} onClick={() => setFilter("infused")}>
-            Infused Items
-          </FilterButton>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="relative h-48">
-                <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
-              </div>
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-xl font-semibold">{product.name}</h2>
-                  <span className="font-medium">${(product.price / 100).toFixed(2)}</span>
-                </div>
-                <p className="text-gray-600 mb-4">{product.description}</p>
-
-                {product.requiresAgeVerification && (
-                  <div className="bg-yellow-100 p-2 rounded-md mb-4 text-sm">
-                    Age verification required for purchase
-                  </div>
-                )}
-
-                <button
-                  onClick={() => handleAddToCart(product)}
-                  className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                  disabled={product.requiresAgeVerification && !user}
-                >
-                  {product.requiresAgeVerification && !user ? "Login to Purchase" : "Add to Cart"}
-                </button>
-              </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-8 bg-gray-50 p-6 rounded-lg"
+        >
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <div className="flex items-center mb-4 sm:mb-0">
+              <Filter className="h-5 w-5 text-primary mr-2" />
+              <h2 className="text-xl font-bold">Filter Products</h2>
             </div>
-          ))}
-        </div>
-      )}
+            <div className="flex flex-wrap gap-2">
+              <FilterButton active={filter === "all"} onClick={() => setFilter("all")}>
+                All
+              </FilterButton>
+              <FilterButton active={filter === "appetizer"} onClick={() => setFilter("appetizer")}>
+                Appetizers
+              </FilterButton>
+              <FilterButton active={filter === "main"} onClick={() => setFilter("main")}>
+                Main Courses
+              </FilterButton>
+              <FilterButton active={filter === "infused"} onClick={() => setFilter("infused")}>
+                Infused Items
+              </FilterButton>
+            </div>
+          </div>
+        </motion.div>
 
-      {showVerification && <AgeVerificationModal onClose={handleVerificationComplete} showIdVerification={true} />}
-    </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+              className="rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+            />
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={filter}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <StaggeredItems className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredProducts.map((product) => (
+                  <StaggeredItem key={product.id}>
+                    <motion.div whileHover={{ y: -10 }} className="menu-card">
+                      <div className="relative">
+                        <Image
+                          src={product.image || "/placeholder.svg"}
+                          alt={product.name}
+                          width={400}
+                          height={300}
+                          className="menu-card-image"
+                        />
+                        {product.requiresAgeVerification && (
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="absolute top-0 right-0 bg-accent text-white px-3 py-1 text-sm font-bold"
+                          >
+                            21+ ONLY
+                          </motion.div>
+                        )}
+                      </div>
+                      <div className="menu-card-content">
+                        <h2 className="menu-card-title">{product.name}</h2>
+                        <p className="menu-card-description">{product.description}</p>
+                        <div className="flex justify-between items-center mt-4">
+                          <span className="menu-card-price">${(product.price / 100).toFixed(2)}</span>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleAddToCart(product)}
+                            className="flex items-center bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+                            disabled={product.requiresAgeVerification && !user}
+                          >
+                            <ShoppingBag className="h-4 w-4 mr-2" />
+                            {product.requiresAgeVerification && !user ? "Login to Purchase" : "Add to Cart"}
+                          </motion.button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </StaggeredItem>
+                ))}
+              </StaggeredItems>
+            </motion.div>
+          </AnimatePresence>
+        )}
+
+        <AnimatePresence>
+          {showVerification && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <AgeVerificationModal onClose={handleVerificationComplete} showIdVerification={true} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </PageTransition>
   )
 }
 
@@ -135,13 +196,15 @@ function FilterButton({
   onClick: () => void
 }) {
   return (
-    <button
+    <motion.button
+      whileHover={{ y: -2 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`px-4 py-2 rounded-md ${
-        active ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+      className={`px-4 py-2 rounded-md font-medium transition-colors ${
+        active ? "bg-primary text-white" : "bg-white text-gray-800 hover:bg-gray-100"
       }`}
     >
       {children}
-    </button>
+    </motion.button>
   )
 }

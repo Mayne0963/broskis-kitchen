@@ -59,13 +59,15 @@
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
     "ws": "latest",
+    "@emotion/is-prop-valid": "latest",
     "firebase": "latest",
     "firebase-admin": "latest",
     "stripe": "latest",
     "js-cookie": "latest",
     "@stripe/stripe-js": "latest",
     "nodemailer": "latest",
-    "openai": "latest"
+    "openai": "latest",
+    "framer-motion": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
