@@ -1,192 +1,64 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { useAgeVerification } from "@/contexts/AgeVerificationContext"
+import { Button } from "@/components/ui/button"
+import { AlertTriangle, Info } from "lucide-react"
 
-interface AgeVerificationModalProps {
-  onClose?: () => void
-  showIdVerification?: boolean
-}
-
-export default function AgeVerificationModal({ onClose, showIdVerification = false }: AgeVerificationModalProps) {
-  const { verifyAge, isPending } = useAgeVerification()
-  const [month, setMonth] = useState("")
-  const [day, setDay] = useState("")
-  const [year, setYear] = useState("")
-  const [idName, setIdName] = useState("")
-  const [error, setError] = useState("")
-  const [advancedVerification, setAdvancedVerification] = useState(false)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-
-    // Validate inputs
-    if (!month || !day || !year) {
-      setError("Please enter your complete date of birth")
-      return
-    }
-
-    const monthNum = Number.parseInt(month, 10)
-    const dayNum = Number.parseInt(day, 10)
-    const yearNum = Number.parseInt(year, 10)
-
-    // Basic validation
-    if (
-      isNaN(monthNum) ||
-      isNaN(dayNum) ||
-      isNaN(yearNum) ||
-      monthNum < 1 ||
-      monthNum > 12 ||
-      dayNum < 1 ||
-      dayNum > 31 ||
-      yearNum < 1900 ||
-      yearNum > new Date().getFullYear()
-    ) {
-      setError("Please enter a valid date of birth")
-      return
-    }
-
-    // If advanced verification is enabled, validate ID name
-    if (advancedVerification && !idName.trim()) {
-      setError("Please enter the name on your ID")
-      return
-    }
-
-    // Create date object (month is 0-indexed in JS Date)
-    const dob = new Date(yearNum, monthNum - 1, dayNum)
-
-    // Verify age
-    const verified = await verifyAge(dob, advancedVerification ? idName : undefined)
-
-    if (!verified) {
-      setError("Age verification failed. You must be 21 or older to access this content.")
-      return
-    }
-
-    // Close modal if verification successful and onClose provided
-    if (onClose) {
-      onClose()
-    }
-  }
+export function AgeVerificationModal() {
+  const { verify, cancel, isPending } = useAgeVerification()
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Age Verification Required</h2>
-          <p className="mb-6 text-gray-600">
-            You must be 21 years or older to view and purchase infused products. Please enter your date of birth to
-            verify your age.
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <motion.div
+          className="bg-black border-2 border-gold rounded-lg max-w-md w-full p-6"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ type: "spring", damping: 25 }}
+        >
+          <div className="flex items-center justify-center mb-4 text-red-500">
+            <AlertTriangle size={40} />
+          </div>
+          <h2 className="text-2xl font-bold text-center text-white mb-4">Age Verification Required</h2>
+          <p className="text-gray-300 text-center mb-6">
+            You are attempting to view or purchase infused products. These products are only available to customers who
+            are 21 years of age or older.
           </p>
 
-          {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
-
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label htmlFor="month" className="sr-only">
-                    Month
-                  </label>
-                  <input
-                    type="text"
-                    id="month"
-                    placeholder="MM"
-                    maxLength={2}
-                    value={month}
-                    onChange={(e) => setMonth(e.target.value.replace(/\D/g, "").slice(0, 2))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="day" className="sr-only">
-                    Day
-                  </label>
-                  <input
-                    type="text"
-                    id="day"
-                    placeholder="DD"
-                    maxLength={2}
-                    value={day}
-                    onChange={(e) => setDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="year" className="sr-only">
-                    Year
-                  </label>
-                  <input
-                    type="text"
-                    id="year"
-                    placeholder="YYYY"
-                    maxLength={4}
-                    value={year}
-                    onChange={(e) => setYear(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {showIdVerification && (
-              <div className="mb-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={advancedVerification}
-                    onChange={(e) => setAdvancedVerification(e.target.checked)}
-                    className="mr-2"
-                  />
-                  <span className="text-sm">Use advanced ID verification</span>
-                </label>
-              </div>
-            )}
-
-            {advancedVerification && (
-              <div className="mb-6">
-                <label htmlFor="idName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Name on ID
-                </label>
-                <input
-                  type="text"
-                  id="idName"
-                  value={idName}
-                  onChange={(e) => setIdName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter the full name on your ID"
-                />
-              </div>
-            )}
-
-            <div className="flex justify-between items-center">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isPending}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-              >
-                {isPending ? "Verifying..." : "Verify Age"}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-6 text-xs text-gray-500 text-center">
-            By entering your date of birth, you confirm that all information provided is accurate and you agree to our
-            terms of service regarding age verification.
+          <div className="flex items-start p-3 bg-blue-900/30 rounded-md mb-6">
+            <Info className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
+            <p className="text-blue-300 text-sm">
+              For enhanced security and compliance, we now offer ID verification. This provides a more secure way to
+              verify your age and gives you full access to all products.
+            </p>
           </div>
-        </div>
-      </div>
-    </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button variant="outline" className="flex-1 border-gold text-gold hover:bg-gold/10" onClick={cancel}>
+              Cancel
+            </Button>
+            <Button className="flex-1" onClick={verify} disabled={isPending}>
+              {isPending ? (
+                <span className="flex items-center">
+                  <span className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  Verifying...
+                </span>
+              ) : (
+                "Verify with ID"
+              )}
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   )
 }
+
+export default AgeVerificationModal

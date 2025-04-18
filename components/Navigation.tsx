@@ -1,215 +1,138 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { useAuth } from "@/contexts/AuthContext"
-import CartIcon from "./CartIcon"
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { Menu, X, Settings } from "lucide-react"
+import { Cart } from "@/components/Cart"
+import { useAgeVerification } from "@/contexts/AgeVerificationContext"
 
 export default function Navigation() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
-  const { user, signOut } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { verificationStatus } = useAgeVerification()
 
-  const isActive = (path: string) => {
-    return pathname === path ? "active font-bold" : ""
-  }
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
+
+  const navLinks = [
+    { href: "/", label: "Home" },
+    { href: "/menu", label: "Menu" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+  ]
+
+  const getStatusIndicator = () => {
+    switch (verificationStatus) {
+      case "verified":
+        return <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></span>
+      case "pending":
+        return <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+      case "rejected":
+        return <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+      default:
+        return null
+    }
   }
 
   return (
-    <nav className="bg-black border-b border-gold/30 py-4 px-6 sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto">
+    <header
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        scrolled ? "bg-black shadow-lg py-2" : "bg-transparent py-4"
+      }`}
+    >
+      <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center"
-          >
-            <Link href="/" className="flex items-center">
-              <Image src="/logo.png" alt="Broski's Kitchen Logo" width={50} height={50} className="mr-3" />
-              <div>
-                <span className="text-3xl font-display font-bold text-primary block leading-none">Broski&apos;s</span>
-                <span className="text-xl font-graffiti text-white">Kitchen</span>
-              </div>
-            </Link>
-          </motion.div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleMobileMenu}
-              className="text-primary hover:text-white focus:outline-none"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </motion.button>
-          </div>
+          <Link href="/" className="text-white font-bold text-2xl z-50">
+            Broski's Kitchen
+          </Link>
 
           {/* Desktop Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="hidden md:flex items-center space-x-6"
-          >
-            <motion.div whileHover={{ y: -2 }}>
-              <Link href="/menu" className={`nav-link ${isActive("/menu")}`}>
-                Menu
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }}>
-              <Link href="/shop" className={`nav-link ${isActive("/shop")}`}>
-                Shop
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }}>
-              <Link href="/infused" className={`nav-link ${isActive("/infused")}`}>
-                Infused
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }}>
-              <Link href="/calendar" className={`nav-link ${isActive("/calendar")}`}>
-                Events
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ y: -2 }}>
-              <Link href="/loyalty" className={`nav-link ${isActive("/loyalty")}`}>
-                Loyalty
-              </Link>
-            </motion.div>
-
-            {user ? (
-              <>
-                <motion.div whileHover={{ y: -2 }}>
-                  <Link href="/dashboard" className={`nav-link ${isActive("/dashboard")}`}>
-                    Dashboard
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ y: -2 }}>
-                  <button onClick={() => signOut()} className="nav-link hover:text-primary">
-                    Sign Out
-                  </button>
-                </motion.div>
-              </>
-            ) : (
-              <>
-                <motion.div whileHover={{ y: -2 }}>
-                  <Link href="/login" className={`nav-link ${isActive("/login")}`}>
-                    Sign In
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
-                    href="/register"
-                    className="bg-primary text-black px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    Sign Up
-                  </Link>
-                </motion.div>
-              </>
-            )}
-
-            <CartIcon />
-          </motion.div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden mt-4 py-4 border-t border-gold/30 overflow-hidden"
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="flex flex-col space-y-4"
+          <nav className="hidden md:flex items-center space-x-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-white hover:text-gold transition-colors relative ${
+                  pathname === link.href ? "text-gold" : ""
+                }`}
               >
-                <Link href="/menu" className={`nav-link ${isActive("/menu")}`} onClick={() => setMobileMenuOpen(false)}>
-                  Menu
-                </Link>
-                <Link href="/shop" className={`nav-link ${isActive("/shop")}`} onClick={() => setMobileMenuOpen(false)}>
-                  Shop
-                </Link>
-                <Link
-                  href="/infused"
-                  className={`nav-link ${isActive("/infused")}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Infused
-                </Link>
-                <Link
-                  href="/calendar"
-                  className={`nav-link ${isActive("/calendar")}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Events
-                </Link>
-                <Link
-                  href="/loyalty"
-                  className={`nav-link ${isActive("/loyalty")}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Loyalty
-                </Link>
-
-                {user ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      className={`nav-link ${isActive("/dashboard")}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <button
-                      onClick={() => {
-                        signOut()
-                        setMobileMenuOpen(false)
-                      }}
-                      className="nav-link hover:text-primary text-left"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      className={`nav-link ${isActive("/login")}`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/register"
-                      className="bg-primary text-black px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-block"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Sign Up
-                    </Link>
-                  </>
+                {link.label}
+                {pathname === link.href && (
+                  <motion.div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gold" layoutId="navbar-indicator" />
                 )}
+              </Link>
+            ))}
+            <Link href="/settings" className="text-white hover:text-gold transition-colors relative">
+              <Settings className="h-5 w-5" />
+              {getStatusIndicator()}
+            </Link>
+            <Cart />
+          </nav>
 
-                <div className="pt-2">
-                  <CartIcon />
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Mobile Navigation Toggle */}
+          <div className="flex items-center md:hidden space-x-4">
+            <Link href="/settings" className="text-white hover:text-gold transition-colors relative">
+              <Settings className="h-5 w-5" />
+              {getStatusIndicator()}
+            </Link>
+            <Cart />
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-white focus:outline-none z-50"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
       </div>
-    </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100vh" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black z-40 flex flex-col items-center justify-center"
+          >
+            <nav className="flex flex-col items-center space-y-8">
+              {navLinks.map((link) => (
+                <motion.div
+                  key={link.href}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                >
+                  <Link
+                    href={link.href}
+                    className={`text-white text-2xl font-bold hover:text-gold transition-colors ${
+                      pathname === link.href ? "text-gold" : ""
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   )
 }

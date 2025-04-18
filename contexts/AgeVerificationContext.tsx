@@ -1,98 +1,218 @@
 "use client"
 
 import type React from "react"
-
 import { createContext, useContext, useState, useEffect } from "react"
-import { isVerifiedAge } from "@/utils/ageGate"
-import Cookies from "js-cookie"
+import { useRouter, usePathname } from "next/navigation"
+import { menuItems } from "@/data/menu-items"
 
-interface AgeVerificationContextType {
-  isVerified: boolean
+// Define verification status types
+export type VerificationStatus = "unverified" | "pending" | "verified" | "rejected"
+
+type AgeVerificationContextType = {
+  verificationStatus: VerificationStatus
   isPending: boolean
-  verifyAge: (dob: Date, idName?: string) => Promise<boolean>
+  showVerification: boolean
+  showIdUpload: boolean
+  verificationDate: Date | null
+  verificationExpiry: Date | null
+  verificationMessage: string | null
+  verify: () => void
+  cancel: () => void
   resetVerification: () => void
+  submitIdVerification: (formData: FormData) => Promise<void>
+  checkItemRequiresVerification: (itemId: string) => boolean
+  checkAndShowVerification: (itemId: string) => boolean
+  setShowIdUpload: (show: boolean) => void
+  isVerified: boolean
 }
 
-const AgeVerificationContext = createContext<AgeVerificationContextType | undefined>(undefined)
+const AgeVerificationContext = createContext<AgeVerificationContextType>({
+  verificationStatus: "unverified",
+  isPending: false,
+  showVerification: false,
+  showIdUpload: false,
+  verificationDate: null,
+  verificationExpiry: null,
+  verificationMessage: null,
+  verify: () => {},
+  cancel: () => {},
+  resetVerification: () => {},
+  submitIdVerification: async () => {},
+  checkItemRequiresVerification: () => false,
+  checkAndShowVerification: () => false,
+  setShowIdUpload: () => {},
+  isVerified: false,
+})
 
-export function AgeVerificationProvider({ children }: { children: React.ReactNode }) {
-  const [isVerified, setIsVerified] = useState<boolean>(false)
-  const [isPending, setIsPending] = useState<boolean>(false)
+export const useAgeVerification = () => useContext(AgeVerificationContext)
 
-  // Check if user is already verified on mount
+export const AgeVerificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>("unverified")
+  const [isPending, setIsPending] = useState(false)
+  const [showVerification, setShowVerification] = useState(false)
+  const [showIdUpload, setShowIdUpload] = useState(false)
+  const [verificationDate, setVerificationDate] = useState<Date | null>(null)
+  const [verificationExpiry, setVerificationExpiry] = useState<Date | null>(null)
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Computed property for backward compatibility
+  const isVerified = verificationStatus === "verified"
+
+  // Check local storage for verification status on mount
   useEffect(() => {
-    const storedVerification = sessionStorage.getItem("age-verified")
-    if (storedVerification === "true") {
-      setIsVerified(true)
+    const status = localStorage.getItem("age-verification-status") as VerificationStatus | null
+    if (status) {
+      setVerificationStatus(status)
+    }
+
+    const storedDate = localStorage.getItem("age-verified-date")
+    if (storedDate) {
+      setVerificationDate(new Date(storedDate))
+    }
+
+    const storedExpiry = localStorage.getItem("age-verification-expiry")
+    if (storedExpiry) {
+      setVerificationExpiry(new Date(storedExpiry))
+    }
+
+    const message = localStorage.getItem("age-verification-message")
+    if (message) {
+      setVerificationMessage(message)
+    }
+
+    // Check if verification has expired
+    if (verificationExpiry && new Date() > new Date(verificationExpiry)) {
+      resetVerification()
     }
   }, [])
 
-  const verifyAge = async (dob: Date, idName?: string): Promise<boolean> => {
+  // Function to check if an item requires age verification
+  const checkItemRequiresVerification = (itemId: string): boolean => {
+    const item = menuItems.find((item) => item.id === itemId)
+    return item?.infused || false
+  }
+
+  // Function to check and show verification if needed
+  const checkAndShowVerification = (itemId: string): boolean => {
+    if (verificationStatus === "verified") return true // Already verified
+
+    const requiresVerification = checkItemRequiresVerification(itemId)
+    if (requiresVerification) {
+      setShowVerification(true)
+      return false // Not verified yet
+    }
+
+    return true // No verification needed
+  }
+
+  // Simple verification (without ID)
+  const verify = () => {
+    setIsPending(true)
+    // Simulate verification process
+    setTimeout(() => {
+      setShowVerification(false)
+      setShowIdUpload(true)
+      setIsPending(false)
+    }, 1000)
+  }
+
+  const cancel = () => {
+    setShowVerification(false)
+    setShowIdUpload(false)
+    // If on a product page that requires verification, redirect to menu
+    if (pathname.includes("/menu/product/")) {
+      const productId = pathname.split("/").pop()
+      if (productId && checkItemRequiresVerification(productId)) {
+        router.push("/menu")
+      }
+    }
+  }
+
+  const resetVerification = () => {
+    setVerificationStatus("unverified")
+    setVerificationDate(null)
+    setVerificationExpiry(null)
+    setVerificationMessage(null)
+    localStorage.removeItem("age-verification-status")
+    localStorage.removeItem("age-verified-date")
+    localStorage.removeItem("age-verification-expiry")
+    localStorage.removeItem("age-verification-message")
+  }
+
+  // ID verification submission
+  const submitIdVerification = async (formData: FormData) => {
+    setIsPending(true)
+    setVerificationMessage(null)
+
     try {
-      setIsPending(true)
+      // In a real app, you would upload the ID to a secure server
+      // and potentially use an identity verification service
 
-      // Calculate age
-      const today = new Date()
-      const birthDate = new Date(dob)
-      let age = today.getFullYear() - birthDate.getFullYear()
-      const monthDiff = today.getMonth() - birthDate.getMonth()
+      // Simulate API call with a delay
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--
-      }
+      // Set verification to pending
+      const now = new Date()
+      setVerificationStatus("pending")
+      setVerificationDate(now)
 
-      // Basic age check (must be 21 or older)
-      const isOldEnough = age >= 21
+      // In a real app, the expiry would be set after admin approval
+      // For demo purposes, we'll set it to 30 days from now
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 30)
+      setVerificationExpiry(expiry)
 
-      // If basic check passes and ID name is provided, use AI verification
-      let verificationResult = isOldEnough
+      // Store in localStorage
+      localStorage.setItem("age-verification-status", "pending")
+      localStorage.setItem("age-verified-date", now.toISOString())
+      localStorage.setItem("age-verification-expiry", expiry.toISOString())
 
-      if (isOldEnough && idName) {
-        // Format date as MM/DD/YYYY for the AI verification
-        const formattedDob = `${(birthDate.getMonth() + 1).toString().padStart(2, "0")}/${birthDate
-          .getDate()
-          .toString()
-          .padStart(2, "0")}/${birthDate.getFullYear()}`
+      setVerificationMessage("Your ID has been submitted for verification. This usually takes 1-2 business days.")
 
-        verificationResult = await isVerifiedAge(formattedDob, idName)
-      }
+      // For demo purposes, we'll auto-approve after 5 seconds
+      // In a real app, this would be done by an admin
+      setTimeout(() => {
+        setVerificationStatus("verified")
+        localStorage.setItem("age-verification-status", "verified")
+        setVerificationMessage("Your ID has been verified. You now have access to all products.")
+        localStorage.setItem(
+          "age-verification-message",
+          "Your ID has been verified. You now have access to all products.",
+        )
+      }, 5000)
 
-      if (verificationResult) {
-        // Store verification in session storage
-        sessionStorage.setItem("age-verified", "true")
-
-        // Also set a cookie for middleware
-        Cookies.set("age-verified", "true", { expires: 1 }) // Expires in 1 day
-
-        setIsVerified(true)
-      }
-
-      return verificationResult
+      setShowIdUpload(false)
     } catch (error) {
-      console.error("Age verification error:", error)
-      return false
+      console.error("Error submitting ID verification:", error)
+      setVerificationMessage("There was an error submitting your ID. Please try again.")
     } finally {
       setIsPending(false)
     }
   }
 
-  const resetVerification = () => {
-    sessionStorage.removeItem("age-verified")
-    Cookies.remove("age-verified")
-    setIsVerified(false)
-  }
-
   return (
-    <AgeVerificationContext.Provider value={{ isVerified, isPending, verifyAge, resetVerification }}>
+    <AgeVerificationContext.Provider
+      value={{
+        verificationStatus,
+        isPending,
+        showVerification,
+        showIdUpload,
+        verificationDate,
+        verificationExpiry,
+        verificationMessage,
+        verify,
+        cancel,
+        resetVerification,
+        submitIdVerification,
+        checkItemRequiresVerification,
+        checkAndShowVerification,
+        setShowIdUpload,
+        isVerified,
+      }}
+    >
       {children}
     </AgeVerificationContext.Provider>
   )
-}
-
-export function useAgeVerification() {
-  const context = useContext(AgeVerificationContext)
-  if (context === undefined) {
-    throw new Error("useAgeVerification must be used within an AgeVerificationProvider")
-  }
-  return context
 }

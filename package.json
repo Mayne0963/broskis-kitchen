@@ -63,7 +63,6 @@
     "firebase": "latest",
     "firebase-admin": "latest",
     "stripe": "latest",
-    "js-cookie": "latest",
     "@stripe/stripe-js": "latest",
     "nodemailer": "latest",
     "openai": "latest",
