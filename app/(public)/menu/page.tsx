@@ -1,138 +1,191 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Star } from "lucide-react"
+import { motion } from "framer-motion"
+import PageTransition from "@/components/PageTransition"
+import AnimatedSection from "@/components/AnimatedSection"
 
 export default function MenuPage() {
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-4">OUR MENU</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Explore our selection of bold, flavorful dishes that will satisfy your cravings
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-        <MenuSection
-          title="Appetizers"
-          description="Start your meal off right with our delicious appetizers"
-          items={[
-            {
-              name: "Loaded Nachos",
-              price: "$12.99",
-              description: "Tortilla chips with cheese, jalapeños, and our signature sauce",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Buffalo Wings",
-              price: "$14.99",
-              description: "Crispy wings tossed in buffalo sauce with blue cheese dip",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Mozzarella Sticks",
-              price: "$9.99",
-              description: "Golden-fried mozzarella with marinara sauce",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-          ]}
-        />
-
-        <MenuSection
-          title="Main Courses"
-          description="Satisfy your hunger with our hearty main dishes"
-          items={[
-            {
-              name: "Classic Burger",
-              price: "$16.99",
-              description: "Angus beef patty with lettuce, tomato, and special sauce",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Grilled Chicken Sandwich",
-              price: "$15.99",
-              description: "Marinated chicken breast with avocado and aioli",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Veggie Bowl",
-              price: "$14.99",
-              description: "Seasonal vegetables over quinoa with tahini dressing",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-          ]}
-        />
-      </div>
-
-      <div className="text-center mb-12">
-        <h2 className="section-title">INFUSED MENU</h2>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">Explore our specialty infused items (21+ only)</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-        <MenuSection
-          title="Infused Beverages"
-          description="Refreshing drinks with our special infusion"
-          items={[
-            {
-              name: "Chill Lemonade",
-              price: "$18.99",
-              description: "Refreshing lemonade with our special infusion",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Berry Bliss Tea",
-              price: "$16.99",
-              description: "Mixed berry tea with premium infusion",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Tropical Punch",
-              price: "$19.99",
-              description: "Exotic fruit blend with signature infusion",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-          ]}
-        />
-
-        <MenuSection
-          title="Infused Edibles"
-          description="Delicious treats with our premium infusion"
-          items={[
-            {
-              name: "Chocolate Brownies",
-              price: "$22.99",
-              description: "Rich chocolate brownies with premium infusion",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Gourmet Cookies",
-              price: "$20.99",
-              description: "Assorted cookies with our special infusion",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-            {
-              name: "Fruit Gummies",
-              price: "$24.99",
-              description: "Assorted fruit flavors with signature infusion",
-              image: "/placeholder.svg?height=100&width=100",
-            },
-          ]}
-        />
-      </div>
-
-      <div className="bg-primary/10 p-8 rounded-lg text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Order?</h2>
-        <p className="text-lg mb-6">Place your order now for pickup or delivery</p>
-        <Link
-          href="/shop"
-          className="inline-flex items-center bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+    <PageTransition>
+      <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          Shop Now
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Link>
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-px bg-gold/30 w-16 mr-4"></div>
+            <h2 className="text-primary font-graffiti text-xl">The Menu</h2>
+            <div className="h-px bg-gold/30 w-16 ml-4"></div>
+          </div>
+          <h1 className="text-5xl font-bold mb-4">OUR CULINARY LINEUP</h1>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Explore our selection of bold, flavorful dishes that blend street culture with culinary excellence
+          </p>
+        </motion.div>
+
+        <AnimatedSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+            <MenuSection
+              title="Starters & Sides"
+              description="Begin your culinary journey with these street-inspired appetizers"
+              items={[
+                {
+                  name: "Gold Dusted Wings",
+                  price: "$16.99",
+                  description: "Crispy wings tossed in our signature sauce with edible gold dust",
+                  image: "/placeholder.svg?height=100&width=100&query=gold dusted chicken wings",
+                  featured: true,
+                },
+                {
+                  name: "Brooklyn Loaded Fries",
+                  price: "$14.99",
+                  description: "Hand-cut fries topped with braised oxtail, cheese sauce, and scallions",
+                  image: "/braised-meat-loaded-fries.png",
+                },
+                {
+                  name: "Harlem Cornbread",
+                  price: "$9.99",
+                  description: "Jalapeño cornbread with honey butter and gold flakes",
+                  image: "/placeholder.svg?height=100&width=100&query=cornbread with honey butter",
+                },
+              ]}
+            />
+
+            <MenuSection
+              title="Main Courses"
+              description="Signature dishes that tell our cultural story through flavor"
+              items={[
+                {
+                  name: "Gold Standard Burger",
+                  price: "$18.99",
+                  description: "Premium Angus beef with our signature sauce and gold-dusted brioche bun",
+                  image: "/gilded-grill.png",
+                  featured: true,
+                },
+                {
+                  name: "Notorious Short Ribs",
+                  price: "$24.99",
+                  description: "Slow-braised short ribs with bourbon glaze and truffle mash",
+                  image: "/placeholder.svg?height=100&width=100&query=braised short ribs with mashed potatoes",
+                },
+                {
+                  name: "Queens Vegan Bowl",
+                  price: "$16.99",
+                  description: "Seasonal vegetables over ancient grains with our house sauce",
+                  image: "/placeholder.svg?height=100&width=100&query=vegan bowl with vegetables and grains",
+                },
+              ]}
+            />
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-px bg-gold/30 w-16 mr-4"></div>
+              <h2 className="text-primary font-graffiti text-xl">Premium Selection</h2>
+              <div className="h-px bg-gold/30 w-16 ml-4"></div>
+            </div>
+            <h2 className="section-title">INFUSED MENU</h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto mt-6">
+              Explore our specialty infused items with unique flavor profiles (21+ only)
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+            <MenuSection
+              title="Infused Beverages"
+              description="Refreshing drinks with our special infusion"
+              items={[
+                {
+                  name: "Purple Haze Lemonade",
+                  price: "$12.99",
+                  description: "Lavender-infused lemonade with our special blend of herbs",
+                  image: "/lavender-lemonade-refreshment.png",
+                  featured: true,
+                },
+                {
+                  name: "Brooklyn Tea",
+                  price: "$14.99",
+                  description: "Mixed berry tea with premium infusion and gold flakes",
+                  image: "/placeholder.svg?height=100&width=100&query=berry tea with gold flakes",
+                },
+                {
+                  name: "Uptown Punch",
+                  price: "$16.99",
+                  description: "Exotic fruit blend with signature infusion and fresh herbs",
+                  image: "/placeholder.svg?height=100&width=100&query=exotic fruit punch cocktail",
+                },
+              ]}
+            />
+
+            <MenuSection
+              title="Infused Edibles"
+              description="Delicious treats with our premium infusion"
+              items={[
+                {
+                  name: "24K Brownies",
+                  price: "$22.99",
+                  description: "Rich chocolate brownies with premium infusion and gold leaf",
+                  image: "/placeholder.svg?height=100&width=100&query=chocolate brownies with gold leaf",
+                  featured: true,
+                },
+                {
+                  name: "Biggie Cookies",
+                  price: "$20.99",
+                  description: "Oversized cookies with our special infusion and chocolate chunks",
+                  image: "/placeholder.svg?height=100&width=100&query=large chocolate chunk cookies",
+                },
+                {
+                  name: "Harlem Gummies",
+                  price: "$24.99",
+                  description: "Assorted fruit flavors with signature infusion and sugar coating",
+                  image: "/placeholder.svg?height=100&width=100&query=colorful fruit gummies",
+                },
+              ]}
+            />
+          </div>
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-black to-deepRed-dark p-8 rounded-lg text-center border border-gold/30 relative overflow-hidden"
+          >
+            <div
+              className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: "url('/patterns/urban-pattern.png')",
+                backgroundSize: "cover",
+                mixBlendMode: "overlay",
+              }}
+            ></div>
+
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold mb-4">Ready to Experience the Flavor?</h2>
+              <p className="text-lg mb-6 text-gray-300">Place your order now for pickup or delivery</p>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center bg-primary text-black px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+                >
+                  Shop Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
+        </AnimatedSection>
       </div>
-    </div>
+    </PageTransition>
   )
 }
 
@@ -143,32 +196,46 @@ function MenuSection({
 }: {
   title: string
   description: string
-  items: { name: string; price: string; description: string; image: string }[]
+  items: { name: string; price: string; description: string; image: string; featured?: boolean }[]
 }) {
   return (
-    <div>
-      <h2 className="text-3xl font-bold mb-2">{title}</h2>
-      <p className="text-gray-600 mb-6">{description}</p>
+    <div className="bg-card p-6 rounded-lg border border-gold/20">
+      <h2 className="text-3xl font-bold mb-2 text-white">{title}</h2>
+      <p className="text-gray-400 mb-6">{description}</p>
       <div className="space-y-6">
         {items.map((item, index) => (
-          <div key={index} className="flex border-b pb-6">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            viewport={{ once: true }}
+            className="flex border-b border-gold/10 pb-6"
+          >
             <div className="flex-shrink-0 mr-4">
-              <Image
-                src={item.image || "/placeholder.svg"}
-                alt={item.name}
-                width={80}
-                height={80}
-                className="rounded-md object-cover"
-              />
+              <div className="relative">
+                <Image
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.name}
+                  width={80}
+                  height={80}
+                  className="rounded-md object-cover border border-gold/20"
+                />
+                {item.featured && (
+                  <div className="absolute -top-2 -right-2 bg-primary text-black rounded-full p-1">
+                    <Star className="h-3 w-3" />
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex-grow">
               <div className="flex justify-between">
                 <h3 className="font-bold text-lg">{item.name}</h3>
                 <span className="font-bold text-primary">{item.price}</span>
               </div>
-              <p className="text-gray-600 mt-1">{item.description}</p>
+              <p className="text-gray-400 mt-1">{item.description}</p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

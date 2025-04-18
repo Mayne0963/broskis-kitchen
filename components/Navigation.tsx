@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import CartIcon from "./CartIcon"
@@ -22,12 +23,21 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="bg-white shadow-md py-4 px-6 sticky top-0 z-50">
+    <nav className="bg-black border-b border-gold/30 py-4 px-6 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-            <Link href="/" className="text-3xl font-display font-bold text-primary">
-              Broski&apos;s Kitchen
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center"
+          >
+            <Link href="/" className="flex items-center">
+              <Image src="/logo.png" alt="Broski's Kitchen Logo" width={50} height={50} className="mr-3" />
+              <div>
+                <span className="text-3xl font-display font-bold text-primary block leading-none">Broski&apos;s</span>
+                <span className="text-xl font-graffiti text-white">Kitchen</span>
+              </div>
             </Link>
           </motion.div>
 
@@ -36,7 +46,7 @@ export default function Navigation() {
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={toggleMobileMenu}
-              className="text-secondary hover:text-primary focus:outline-none"
+              className="text-primary hover:text-white focus:outline-none"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </motion.button>
@@ -98,7 +108,7 @@ export default function Navigation() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     href="/register"
-                    className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                    className="bg-primary text-black px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
                   >
                     Sign Up
                   </Link>
@@ -118,7 +128,7 @@ export default function Navigation() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden mt-4 py-4 border-t border-gray-200 overflow-hidden"
+              className="md:hidden mt-4 py-4 border-t border-gold/30 overflow-hidden"
             >
               <motion.div
                 initial={{ opacity: 0 }}
@@ -184,7 +194,7 @@ export default function Navigation() {
                     </Link>
                     <Link
                       href="/register"
-                      className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-block"
+                      className="bg-primary text-black px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-block"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Sign Up

@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss"
+
 const config: Config = {
   darkMode: ["class"],
   content: [
@@ -43,6 +44,24 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        gold: {
+          DEFAULT: "#D4AF37",
+          light: "#F2D675",
+          dark: "#AA8C2C",
+        },
+        deepRed: {
+          DEFAULT: "#8B0000",
+          light: "#B22222",
+          dark: "#640000",
+        },
+        neonGreen: {
+          DEFAULT: "#39FF14",
+          muted: "rgba(57, 255, 20, 0.7)",
+        },
+        neonPurple: {
+          DEFAULT: "#BC13FE",
+          muted: "rgba(188, 19, 254, 0.7)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -50,8 +69,16 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Poppins", "sans-serif"],
-        display: ["Bebas Neue", "sans-serif"],
+        sans: ["var(--font-poppins)", "sans-serif"],
+        display: ["var(--font-bebas-neue)", "sans-serif"],
+        graffiti: ["var(--font-permanent-marker)", "cursive"],
+        accent: ["var(--font-teko)", "sans-serif"],
+      },
+      backgroundImage: {
+        "urban-pattern": "url('/patterns/urban-pattern.png')",
+        "gold-texture": "url('/patterns/gold-texture.png')",
+        "graffiti-wall": "url('/patterns/graffiti-wall.jpg')",
+        concrete: "url('/patterns/concrete-texture.jpg')",
       },
     },
   },

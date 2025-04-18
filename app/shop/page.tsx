@@ -11,7 +11,7 @@ import Image from "next/image"
 import { useAuth } from "@/contexts/AuthContext"
 import { useAgeVerification } from "@/contexts/AgeVerificationContext"
 import AgeVerificationModal from "@/components/AgeVerificationModal"
-import { Filter, ShoppingBag } from "lucide-react"
+import { Filter, ShoppingBag, Flame } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import PageTransition from "@/components/PageTransition"
 import StaggeredItems, { StaggeredItem } from "@/components/StaggeredItems"
@@ -75,9 +75,14 @@ export default function Shop() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-5xl font-bold mb-4">SHOP OUR MENU</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Browse our selection of mouth-watering dishes and place your order for pickup or delivery
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-px bg-gold/30 w-16 mr-4"></div>
+            <h2 className="text-primary font-graffiti text-xl">Our Menu</h2>
+            <div className="h-px bg-gold/30 w-16 ml-4"></div>
+          </div>
+          <h1 className="text-5xl font-bold mb-4">SHOP OUR FLAVORS</h1>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Browse our selection of street-inspired, culturally rich dishes and place your order for pickup or delivery
           </p>
         </motion.div>
 
@@ -85,7 +90,7 @@ export default function Shop() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8 bg-gray-50 p-6 rounded-lg"
+          className="mb-8 bg-card p-6 rounded-lg border border-gold/20"
         >
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="flex items-center mb-4 sm:mb-0">
@@ -143,9 +148,19 @@ export default function Shop() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="absolute top-0 right-0 bg-accent text-white px-3 py-1 text-sm font-bold"
+                            className="absolute top-0 right-0 bg-secondary text-white px-3 py-1 text-sm font-bold"
                           >
                             21+ ONLY
+                          </motion.div>
+                        )}
+                        {product.featured && (
+                          <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="absolute top-0 left-0 bg-primary text-black px-3 py-1 text-sm font-bold flex items-center"
+                          >
+                            <Flame className="h-4 w-4 mr-1" /> FEATURED
                           </motion.div>
                         )}
                       </div>
@@ -158,7 +173,7 @@ export default function Shop() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleAddToCart(product)}
-                            className="flex items-center bg-primary text-white px-4 py-2 rounded-lg font-bold hover:bg-primary/90 transition-colors"
+                            className="flex items-center bg-primary text-black px-4 py-2 rounded-md font-bold hover:bg-primary/90 transition-colors"
                             disabled={product.requiresAgeVerification && !user}
                           >
                             <ShoppingBag className="h-4 w-4 mr-2" />
@@ -201,7 +216,7 @@ function FilterButton({
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={`px-4 py-2 rounded-md font-medium transition-colors ${
-        active ? "bg-primary text-white" : "bg-white text-gray-800 hover:bg-gray-100"
+        active ? "bg-primary text-black" : "bg-muted text-white hover:bg-muted/80"
       }`}
     >
       {children}

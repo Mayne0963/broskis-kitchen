@@ -2,40 +2,54 @@
 
 import type React from "react"
 
+import { useEffect, useState } from "react"
+import { Inter, Bebas_Neue, Permanent_Marker, Teko } from "next/font/google"
 import "./globals.css"
-import { Inter } from "next/font/google"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
+import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext"
+import MusicPlayer from "@/components/MusicPlayer"
+import { AgeVerificationProvider } from "@/contexts/AgeVerificationContext"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { CartProvider } from "@/contexts/CartContext"
-import { AgeVerificationProvider } from "@/contexts/AgeVerificationContext"
 import { DeliveryProvider } from "@/contexts/DeliveryContext"
-import { AnimatePresence } from "framer-motion"
+import AgeVerificationModal from "@/components/AgeVerificationModal"
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const bebasNeue = Bebas_Neue({ weight: "400", variable: "--font-bebas", subsets: ["latin"] })
+const permanentMarker = Permanent_Marker({ weight: "400", variable: "--font-marker", subsets: ["latin"] })
+const teko = Teko({ subsets: ["latin"], variable: "--font-teko" })
 
-export default function ClientLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={`${inter.variable} ${bebasNeue.variable} ${permanentMarker.variable} ${teko.variable} font-sans bg-black text-white`}
+      >
         <AuthProvider>
-          <CartProvider>
-            <AgeVerificationProvider>
+          <AgeVerificationProvider>
+            <CartProvider>
               <DeliveryProvider>
-                <div className="flex flex-col min-h-screen">
+                <MusicPlayerProvider>
                   <Navigation />
-                  <main className="flex-grow">
-                    <AnimatePresence mode="wait">{children}</AnimatePresence>
-                  </main>
+                  <AgeVerificationModal />
+                  {children}
                   <Footer />
-                </div>
+                  <MusicPlayer />
+                </MusicPlayerProvider>
               </DeliveryProvider>
-            </AgeVerificationProvider>
-          </CartProvider>
+            </CartProvider>
+          </AgeVerificationProvider>
         </AuthProvider>
       </body>
     </html>
