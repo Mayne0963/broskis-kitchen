@@ -1,6 +1,6 @@
-import admin from 'firebase-admin';
+import admin from "firebase-admin"
 
 if (!admin.apps.length) {
-  admin.initializeApp();
+  admin.initializeApp()
 }
-export default admin;
+export default admin

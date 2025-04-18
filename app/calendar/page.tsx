@@ -1,1 +1,3 @@
-export default function EventsCalendar() { return <div>Events Calendar</div>; }
+export default function EventsCalendar() {
+  return <div>Events Calendar</div>
+}

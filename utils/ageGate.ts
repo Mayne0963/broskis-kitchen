@@ -1,5 +1,5 @@
-import { verifyAge } from "@/lib/aiEngine";
+import { verifyAge } from "@/lib/aiEngine"
 
 export const isVerifiedAge = async (dob: string, idName: string) => {
-  return await verifyAge(dob, idName);
-};
+  return await verifyAge(dob, idName)
+}

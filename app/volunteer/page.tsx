@@ -1,1 +1,3 @@
-export default function VolunteerSignup() { return <div>Volunteer Portal</div>; }
+export default function VolunteerSignup() {
+  return <div>Volunteer Portal</div>
+}
