@@ -1,36 +1,17 @@
-# Broskis Kitchen 🍔🔥
+# Broski's Kitchen
 
-AI-powered, culture-first, hip-hop gourmet platform.
+A modern food ordering platform with age verification for infused products.
 
----
+## Getting Started
 
-## 💻 Setup Instructions
+First, run the development server:
 
-1. `npm install`
-2. Create `.env.local` file using the example below
-3. `npm run dev` to start local server
+\`\`\`bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+\`\`\`
 
----
-
-## 🧪 .env.local Example
-
-```bash
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-
-STRIPE_SECRET_KEY=
-OPENAI_API_KEY=
-```
-
----
-
-## 🌐 Core Features
-
-- Age-gated infused menu access
-- Role-based gated content
-- Firebase Auth + Firestore
-- Stripe Checkout
-- AI-powered moderation, content, verification, and analytics
-- Community + game-based loyalty rewards
-- Admin panel for full control
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
