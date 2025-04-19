@@ -2,50 +2,53 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
-import { Inter, Bebas_Neue, Permanent_Marker, Teko } from "next/font/google"
-import "./globals.css"
-import Navigation from "@/components/Navigation"
-import Footer from "@/components/Footer"
-import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext"
-import MusicPlayer from "@/components/MusicPlayer"
-import { AgeVerificationProvider } from "@/contexts/AgeVerificationContext"
+import { useState, useEffect } from "react"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { CartProvider } from "@/contexts/CartContext"
 import { DeliveryProvider } from "@/contexts/DeliveryContext"
-import AgeVerificationModal from "@/components/AgeVerificationModal"
+import { AgeVerificationProvider } from "@/contexts/AgeVerificationContext"
+import { MusicPlayerProvider } from "@/contexts/MusicPlayerContext"
+import Navigation from "@/components/Navigation"
+import Footer from "@/components/Footer"
+import MusicPlayer from "@/components/MusicPlayer/MusicPlayer"
+import LoadingSpinner from "@/components/LoadingSpinner"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
-const bebasNeue = Bebas_Neue({ weight: "400", variable: "--font-bebas", subsets: ["latin"] })
-const permanentMarker = Permanent_Marker({ weight: "400", variable: "--font-marker", subsets: ["latin"] })
-const teko = Teko({ subsets: ["latin"], variable: "--font-teko" })
-
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false)
+export default function ClientLayout({
+  children,
+  fontClasses = "",
+}: {
+  children: React.ReactNode
+  fontClasses?: string
+}) {
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setMounted(true)
+    // Simulate loading time for resources
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
   }, [])
 
-  if (!mounted) {
-    return null
+  if (loading) {
+    return <LoadingSpinner />
   }
 
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${bebasNeue.variable} ${permanentMarker.variable} ${teko.variable} font-sans bg-black text-white`}
-      >
+      <body className={fontClasses}>
         <AuthProvider>
           <AgeVerificationProvider>
             <CartProvider>
               <DeliveryProvider>
                 <MusicPlayerProvider>
-                  <Navigation />
-                  <AgeVerificationModal />
-                  {children}
-                  <Footer />
-                  <MusicPlayer />
+                  <div className="flex flex-col min-h-screen">
+                    <Navigation />
+                    <main className="flex-grow pt-16">{children}</main>
+                    <Footer />
+                    <MusicPlayer />
+                  </div>
                 </MusicPlayerProvider>
               </DeliveryProvider>
             </CartProvider>

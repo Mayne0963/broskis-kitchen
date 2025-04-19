@@ -1,208 +1,190 @@
 "use client"
 
-import { useMusicPlayer } from "@/contexts/MusicPlayerContext"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Music, Minimize2, Maximize2, RefreshCw } from "lucide-react"
-import Image from "next/image"
-import PlaylistSelector from "./PlaylistSelector"
-import TrackList from "./TrackList"
+import { ChevronUp, ChevronDown } from "lucide-react"
+import { useMusicPlayer } from "@/contexts/MusicPlayerContext"
 import MusicPlayerControls from "./MusicPlayerControls"
 import MusicPlayerProgress from "./MusicPlayerProgress"
+import PlaylistSelector from "./PlaylistSelector"
+import TrackList from "./TrackList"
 import ContentFilterToggle from "./ContentFilterToggle"
 
 export default function MusicPlayer() {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [showPlaylists, setShowPlaylists] = useState(false)
   const {
-    isPlaying,
     currentTrack,
+    isPlaying,
+    togglePlay,
+    nextTrack,
+    prevTrack,
+    currentTime,
+    duration,
+    setCurrentTime,
+    volume,
+    setVolume,
     currentPlaylist,
     playlists,
-    isMinimized,
-    isOpen,
-    toggleMinimize,
-    toggleOpen,
-    refreshTrendingPlaylist,
+    selectPlaylist,
+    tracks,
+    selectTrack,
+    showExplicitContent,
+    toggleExplicitContent,
   } = useMusicPlayer()
-  const [activeTab, setActiveTab] = useState<"playlists" | "tracks">("playlists")
 
-  // Variants for animations
-  const playerVariants = {
-    minimized: {
-      height: "64px",
-      width: isOpen ? "300px" : "64px",
-      transition: { duration: 0.3, ease: "easeInOut" },
-    },
-    expanded: {
-      height: "500px",
-      width: "300px",
-      transition: { duration: 0.3, ease: "easeInOut" },
-    },
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded)
+    if (isExpanded) {
+      setShowPlaylists(false)
+    }
   }
 
-  const contentVariants = {
-    minimized: {
-      opacity: 0,
-      transition: { duration: 0.2 },
-    },
-    expanded: {
-      opacity: 1,
-      transition: { duration: 0.3, delay: 0.1 },
-    },
-  }
-
-  const iconVariants = {
-    minimized: {
-      rotate: 0,
-      transition: { duration: 0.3 },
-    },
-    expanded: {
-      rotate: 360,
-      transition: { duration: 0.5 },
-    },
+  const togglePlaylists = () => {
+    setShowPlaylists(!showPlaylists)
   }
 
   return (
     <motion.div
-      className="fixed bottom-4 right-4 bg-gray-900 rounded-lg shadow-xl overflow-hidden z-50 border border-gold/30"
-      variants={playerVariants}
-      animate={isMinimized ? "minimized" : "expanded"}
-      initial="minimized"
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      transition={{ delay: 1, duration: 0.5 }}
+      className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-gold/30"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-3 bg-black/50 border-b border-gold/20">
-        <div className="flex items-center">
-          <motion.div variants={iconVariants} animate={isPlaying ? "expanded" : "minimized"} className="mr-2">
-            <Music size={20} className="text-gold" />
-          </motion.div>
-          {(!isMinimized || isOpen) && (
-            <motion.h3
-              className="text-white font-medium text-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              Broski's Kitchen Music
-            </motion.h3>
+      {/* Collapsed Player */}
+      <div
+        className={`px-4 py-2 flex items-center justify-between cursor-pointer ${
+          isExpanded ? "border-b border-gold/30" : ""
+        }`}
+        onClick={toggleExpanded}
+      >
+        <div className="flex items-center flex-1">
+          {currentTrack ? (
+            <>
+              <div className="w-10 h-10 rounded overflow-hidden mr-3 flex-shrink-0">
+                <img
+                  src={currentTrack.coverArt || "/placeholder.svg"}
+                  alt={currentTrack.title}
+                  className={`w-full h-full object-cover ${isPlaying ? "music-pulse" : ""}`}
+                />
+              </div>
+              <div className="mr-4 flex-1 min-w-0">
+                <p className="text-white font-medium truncate">{currentTrack.title}</p>
+                <p className="text-gray-400 text-sm truncate">{currentTrack.artist}</p>
+              </div>
+            </>
+          ) : (
+            <div className="mr-4 flex-1">
+              <p className="text-white font-medium">Select a track</p>
+              <p className="text-gray-400 text-sm">Broski's Kitchen Playlist</p>
+            </div>
           )}
         </div>
+
         <div className="flex items-center">
-          {!isMinimized && (
-            <button
-              onClick={toggleOpen}
-              className="p-1 text-gray-400 hover:text-white mr-2"
-              aria-label={isOpen ? "Collapse player" : "Expand player"}
-            >
-              {isOpen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-            </button>
-          )}
-          <button
-            onClick={toggleMinimize}
-            className="p-1 text-gray-400 hover:text-white"
-            aria-label={isMinimized ? "Expand player" : "Minimize player"}
+          <MusicPlayerControls
+            isPlaying={isPlaying}
+            togglePlay={togglePlay}
+            nextTrack={nextTrack}
+            prevTrack={prevTrack}
+            compact={true}
+          />
+          <motion.div
+            whileHover={{ y: -2 }}
+            className="ml-2 text-white"
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleExpanded()
+            }}
           >
-            {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
-          </button>
+            {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronUp className="h-5 w-5" />}
+          </motion.div>
         </div>
       </div>
 
-      {/* Minimized Player */}
-      {isMinimized && (
-        <div className="flex items-center p-2">
-          {isOpen && currentTrack && (
-            <div className="flex items-center flex-1 mr-2">
-              <div className="relative w-8 h-8 mr-2">
-                <Image
-                  src={currentTrack.cover || "/placeholder.svg"}
-                  alt={currentTrack.title}
-                  fill
-                  className="object-cover rounded"
+      {/* Expanded Player */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-black text-white overflow-hidden"
+          >
+            <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Left: Current Track Info */}
+              <div className="flex flex-col items-center md:items-start">
+                {currentTrack ? (
+                  <>
+                    <div className="w-40 h-40 rounded-lg overflow-hidden mb-4 shadow-lg border border-gold/20">
+                      <img
+                        src={currentTrack.coverArt || "/placeholder.svg"}
+                        alt={currentTrack.title}
+                        className={`w-full h-full object-cover ${isPlaying ? "music-pulse" : ""}`}
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold mb-1">{currentTrack.title}</h3>
+                    <p className="text-gray-400 mb-4">{currentTrack.artist}</p>
+                  </>
+                ) : (
+                  <div className="w-40 h-40 rounded-lg overflow-hidden mb-4 shadow-lg border border-gold/20 flex items-center justify-center bg-gray-900">
+                    <p className="text-gray-400 text-center px-4">Select a track to start listening</p>
+                  </div>
+                )}
+
+                <ContentFilterToggle
+                  showExplicitContent={showExplicitContent}
+                  toggleExplicitContent={toggleExplicitContent}
                 />
               </div>
-              <div className="truncate">
-                <p className="text-white text-xs font-medium truncate">{currentTrack.title}</p>
-                <p className="text-gray-400 text-xs truncate">{currentTrack.artist}</p>
-              </div>
-            </div>
-          )}
-          <MusicPlayerControls minimal={true} />
-        </div>
-      )}
 
-      {/* Expanded Player */}
-      {!isMinimized && (
-        <AnimatePresence>
-          <motion.div
-            variants={contentVariants}
-            initial="minimized"
-            animate="expanded"
-            exit="minimized"
-            className="flex flex-col h-full"
-          >
-            {/* Now Playing */}
-            {currentTrack && (
-              <div className="p-4 flex flex-col items-center">
-                <div className="relative w-40 h-40 mb-4 rounded-md overflow-hidden border-2 border-gold/30">
-                  <Image
-                    src={currentTrack.cover || "/placeholder.svg"}
-                    alt={currentTrack.title}
-                    fill
-                    className="object-cover"
+              {/* Center: Controls and Progress */}
+              <div className="flex flex-col justify-center">
+                <MusicPlayerControls
+                  isPlaying={isPlaying}
+                  togglePlay={togglePlay}
+                  nextTrack={nextTrack}
+                  prevTrack={prevTrack}
+                  compact={false}
+                />
+                <MusicPlayerProgress
+                  currentTime={currentTime}
+                  duration={duration}
+                  setCurrentTime={setCurrentTime}
+                  volume={volume}
+                  setVolume={setVolume}
+                />
+              </div>
+
+              {/* Right: Playlist */}
+              <div className="flex flex-col">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold">
+                    {showPlaylists ? "Playlists" : currentPlaylist?.name || "Current Playlist"}
+                  </h3>
+                  <button onClick={togglePlaylists} className="text-primary hover:text-primary/80 text-sm font-medium">
+                    {showPlaylists ? "Back to Tracks" : "Change Playlist"}
+                  </button>
+                </div>
+
+                {showPlaylists ? (
+                  <PlaylistSelector
+                    playlists={playlists}
+                    currentPlaylist={currentPlaylist}
+                    onSelect={(playlist) => {
+                      selectPlaylist(playlist)
+                      setShowPlaylists(false)
+                    }}
                   />
-                </div>
-                <h3 className="text-white font-bold text-lg text-center">{currentTrack.title}</h3>
-                <p className="text-gray-300 text-sm mb-2">{currentTrack.artist}</p>
-                <MusicPlayerProgress />
-                <MusicPlayerControls />
+                ) : (
+                  <TrackList tracks={tracks} currentTrack={currentTrack} onSelect={selectTrack} isPlaying={isPlaying} />
+                )}
               </div>
-            )}
-
-            {/* Content Filter Toggle */}
-            <ContentFilterToggle />
-
-            {/* Tabs */}
-            <div className="flex border-b border-gray-800">
-              <button
-                className={`flex-1 py-2 text-sm font-medium ${
-                  activeTab === "playlists" ? "text-gold border-b-2 border-gold" : "text-gray-400"
-                }`}
-                onClick={() => setActiveTab("playlists")}
-              >
-                Playlists
-              </button>
-              <button
-                className={`flex-1 py-2 text-sm font-medium ${
-                  activeTab === "tracks" ? "text-gold border-b-2 border-gold" : "text-gray-400"
-                }`}
-                onClick={() => setActiveTab("tracks")}
-                disabled={!currentPlaylist}
-              >
-                Tracks
-              </button>
-            </div>
-
-            {/* Tab Content */}
-            <div className="flex-1 overflow-y-auto">
-              {activeTab === "playlists" ? (
-                <div>
-                  <div className="flex items-center justify-between p-2 border-b border-gray-800">
-                    <h4 className="text-white text-sm font-medium">Available Playlists</h4>
-                    <button
-                      onClick={refreshTrendingPlaylist}
-                      className="p-1 text-gray-400 hover:text-gold"
-                      title="Refresh trending playlist"
-                    >
-                      <RefreshCw size={14} />
-                    </button>
-                  </div>
-                  <PlaylistSelector playlists={playlists} />
-                </div>
-              ) : (
-                currentPlaylist && <TrackList tracks={currentPlaylist.tracks} />
-              )}
             </div>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

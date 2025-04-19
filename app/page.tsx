@@ -11,7 +11,7 @@ import StaggeredItems, { StaggeredItem } from "@/components/StaggeredItems"
 export default function Home() {
   return (
     <PageTransition>
-      <main>
+      <main className="min-h-screen bg-black text-white">
         {/* Hero Section */}
         <section className="hero-section">
           <div className="hero-content">
@@ -81,7 +81,7 @@ export default function Home() {
                   <motion.div whileHover={{ y: -10, transition: { duration: 0.2 } }} className="menu-card">
                     <div className="relative">
                       <Image
-                        src={item.image || "/placeholder.svg"}
+                        src={item.image || "/placeholder.svg?height=300&width=400&query=delicious food"}
                         alt={item.name}
                         width={400}
                         height={300}
