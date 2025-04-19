@@ -1,6 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'fs', 'net', 'dns' module on the client to prevent errors
+      config.resolve.fallback = {
+        fs: false,
+        net: false,
+        dns: false,
+        tls: false,
+      }
+    }
+    return config
+  },
+  // Added configuration options
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -8,20 +22,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["firebasestorage.googleapis.com"],
     unoptimized: true,
-  },
-  // Ensure we handle MP3 files correctly
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.(mp3)$/,
-      type: "asset/resource",
-      generator: {
-        filename: "static/media/[name].[hash][ext]",
-      },
-    })
-
-    return config
   },
 }
 
